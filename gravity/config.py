@@ -20,8 +20,8 @@ _postgresql_group = cfg.OptGroup(name='postgresql', help='Configure postgresql s
 
 # Options
 _gravity_opts = [
-    cfg.StrOpt(name='file', default='~/gravity_projects.json', help='Path to gravity project file', short='f'),
-    cfg.ListOpt(name='columns', required=True, bounds=True, help='Storage columns', short='c')
+    cfg.StrOpt(name='file', default='gravity_projects.json', help='Path to gravity project file', short='f'),
+    cfg.ListOpt(name='columns', required=False, bounds=True, help='Storage columns', short='c')
 ]
 
 _socket_opts = [
@@ -42,17 +42,17 @@ _backend_opts = [
 ]
 
 _csv_opts = [
-    cfg.StrOpt(name='output', default='./gravity_storage.csv', help='CSV output file'),
+    cfg.StrOpt(name='output', default='gravity_storage.csv', help='CSV output file'),
     cfg.StrOpt(name='delimiter', default=';', help='CSV field delimiter'),
     cfg.StrOpt(name='quoting', default='all', help='CSV quoting character', choices=_quote_choices)
 ]
 
 _sqlite_opts = [
-    cfg.StrOpt(name='database', default='~/gravity_storage.sqlite', help='SQLite database file')
+    cfg.StrOpt(name='database', default='gravity_storage.sqlite', help='SQLite database file')
 ]
 
 _postgresql_opts = [
-    cfg.StrOpt(name='hostname', default='localhost', help='PostgreSQL database'),
+    cfg.StrOpt(name='hostname', default=None, help='PostgreSQL database'),
     cfg.PortOpt(name='port', min=1, max=65535, default=5432, help='PostgreSQL port'),
     cfg.StrOpt(name='username', default='postgres', help='PostgreSQL username'),
     cfg.StrOpt(name='password', default='', secret=True, help='PostgreSQL password'),
