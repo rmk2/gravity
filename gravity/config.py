@@ -1,3 +1,4 @@
+import argparse
 import copy
 from typing import Sequence, Tuple
 
@@ -71,6 +72,40 @@ _opts = [
 ]
 
 
+def add_subparsers(subparsers: argparse.ArgumentParser) -> cfg.SubCommandOpt:
+    project = subparsers.add_parser('project')
+    # project.add_argument('command', choices=['add', 'export', 'list', 'remove'])
+    # project.add_argument('projects', type=str, nargs='*')
+    _project = project.add_mutually_exclusive_group(required=True)
+    _project.add_argument('-a', '--add', nargs=argparse.REMAINDER, metavar='PROJECT', help='Add project(s)')
+    _project.add_argument('-e', '--export', action='store_true', help='Export projects)')
+    _project.add_argument('-l', '--list', action='store_true', help='List projects')
+    _project.add_argument('-r', '--remove', nargs=argparse.REMAINDER, metavar='PROJECT', help='Remove project(s)')
+
+    server = subparsers.add_parser('server')
+    # server.add_argument('command', choices=['start', 'stop'])
+
+    client = subparsers.add_parser('client')
+    # client.add_argument('command', choices=['record'])
+
+    action = subparsers.add_parser('action')
+    # action.add_argument('command', choices=['add', 'export', 'list', 'remove'])
+    # action.add_argument('actions', type=str, nargs='*')
+    _action = action.add_mutually_exclusive_group(required=True)
+    _action.add_argument('-a', '--add', nargs=argparse.REMAINDER, metavar='ACTION', help='Add action(s)')
+    _action.add_argument('-e', '--export', action='store_true', help='Export actions)')
+    _action.add_argument('-l', '--list', action='store_true', help='List actions')
+    _action.add_argument('-r', '--remove', nargs=argparse.REMAINDER, metavar='ACTION', help='Remove action(s)')
+
+    database = subparsers.add_parser('database')
+    # database.add_argument('command', choices=['initialise', 'truncate'])
+    _database = database.add_mutually_exclusive_group(required=True)
+    _database.add_argument('-d', '--drop', action='store_true', help='Drop database tables')
+    _database.add_argument('-i', '--initialise', action='store_true', help='Initialise database tables')
+    _database.add_argument('-p', '--prune', action='store_true', help='Prune database tables')
+    _database.add_argument('-t', '--truncate', action='store_true', help='Truncate database tables')
+
+
 def list_opts() -> Sequence[Tuple[cfg.OptGroup, Sequence[cfg.Opt]]]:
     """List all options. Used by oslo.config to generate example config files"""
     return [(g, copy.deepcopy(o)) for g, o in _opts]
@@ -84,6 +119,8 @@ class BaseConfig(cfg.ConfigOpts):
             self.register_group(group)
             self.register_opts(opts, group)
             self.register_cli_opts(opts, group)
+
+        self.register_cli_opt(cfg.SubCommandOpt('argument', handler=add_subparsers))
 
         # Populate config object via its __call__ method. Otherwise, command-line argument parsing etc. won't work
         # This slightly odd call lets us avoid the worse option of having a global "CONFIG" variable
