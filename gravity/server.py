@@ -1,6 +1,10 @@
 import asyncio
 from functools import partial
 import json
+import signal
+import sys
+
+import daemon
 
 from gravity.backend import csv_writer, log_writer, postgresql_writer, sqlite3_writer
 from gravity.config import BaseConfig
@@ -43,6 +47,13 @@ async def start_listener(config: BaseConfig) -> None:
         await server.serve_forever()
 
 
+def start_server(config: BaseConfig) -> None:
+    def daemon_shutdown(signum, frame):
+        sys.exit(0)
+
+    with daemon.DaemonContext(signal_map={signal.SIGTERM: daemon_shutdown, signal.SIGTSTP: daemon_shutdown}):
+        asyncio.run(start_listener(config))
+
+
 if __name__ == '__main__':
-    asyncio.run(start_listener(BaseConfig()))
-    # raise NotImplementedError('Server cannot be called directly')
+    raise NotImplementedError('Server cannot be called directly')
