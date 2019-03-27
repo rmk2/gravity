@@ -35,7 +35,7 @@ _tcp_opts = [
 ]
 
 _unix_opts = [
-    cfg.StrOpt(name='socket', default='data-data_lineage.sock', help='UNIX socket path', short='S')
+    cfg.StrOpt(name='socket', default='/var/run/gravity.sock', help='UNIX socket path', short='S')
 ]
 
 _backend_opts = [
