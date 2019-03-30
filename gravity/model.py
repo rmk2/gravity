@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import MetaData, Table, Column, VARCHAR, TIMESTAMP, ForeignKey
+from sqlalchemy import MetaData, Table, Column, INTEGER, VARCHAR, TIMESTAMP, ForeignKey
 
 _metadata = MetaData()
 
@@ -22,6 +22,7 @@ action = Table(
 
 worklog = Table(
     'worklog', _metadata,
-    Column('project_id', VARCHAR(37), ForeignKey('project.project_id'), primary_key=True),
-    Column('timestamp', TIMESTAMP(timezone=True), primary_key=True, default=datetime.now),
-    Column('action_id', VARCHAR(37), ForeignKey('action.action_id'), nullable=False))
+    Column('worklog_id', INTEGER, primary_key=True),
+    Column('project_id', VARCHAR(37), ForeignKey('project.project_id'), nullable=False),
+    Column('action_id', VARCHAR(37), ForeignKey('action.action_id'), nullable=False),
+    Column('timestamp', TIMESTAMP(timezone=True), nullable=False, default=datetime.now))
