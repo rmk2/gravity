@@ -6,6 +6,7 @@ from oslo_config import cfg
 
 # Choices
 _backend_choices = ['stdout', 'csv', 'log', 'sqlite', 'postgresql']
+_frontend_choices = ['cli', 'curses']
 _socket_choices = ['tcp', 'unix']
 _quote_choices = ['all', 'minimal', 'nonnumeric', 'none']
 
@@ -14,6 +15,7 @@ _gravity_group = cfg.OptGroup(name='gravity', help='Configure gravity project op
 _socket_group = cfg.OptGroup(name='socket', help='Configure client/server socket options.')
 _tcp_group = cfg.OptGroup(name='tcp', help='Configure TCP socket options.')
 _unix_group = cfg.OptGroup(name='unix', help='Configure UNIX socket options.')
+_frontend_group = cfg.OptGroup(name='frontend', help='Configure client frontend options.')
 _backend_group = cfg.OptGroup(name='backend', help='Configure storage backend options.')
 _csv_group = cfg.OptGroup(name='csv', help='Configure CSV storage backend options.')
 _sqlite_group = cfg.OptGroup(name='sqlite', help='Configure sqlite storage backend options.')
@@ -37,6 +39,10 @@ _tcp_opts = [
 
 _unix_opts = [
     cfg.StrOpt(name='socket', default='/var/run/gravity.sock', help='UNIX socket path', short='S')
+]
+
+_frontend_opts = [
+    cfg.StrOpt(name='interface', default='curses', help='Client frontend', choices=_frontend_choices, short='F')
 ]
 
 _backend_opts = [
@@ -66,6 +72,7 @@ _opts = [
     (_socket_group, _socket_opts),
     (_tcp_group, _tcp_opts),
     (_unix_group, _unix_opts),
+    (_frontend_group, _frontend_opts),
     (_backend_group, _backend_opts),
     (_csv_group, _csv_opts),
     (_sqlite_group, _sqlite_opts),
