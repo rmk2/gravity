@@ -4,6 +4,8 @@ import os
 from typing import Dict, Any
 
 from gravity.config import BaseConfig
+from gravity.database import get_engine
+from gravity.model import worklog
 
 
 def csv_writer(row: Dict[str, Any], config: BaseConfig) -> None:
@@ -35,8 +37,28 @@ def log_writer(row: Dict[str, Any], config: BaseConfig) -> None:
 
 
 def postgresql_writer(row: Dict[str, Any], config: BaseConfig) -> None:
-    pass
+    try:
+        engine = get_engine(config)
+
+        with engine.begin() as connection:
+            connection.execute(worklog.insert(), row)
+
+    except Exception as e:
+        logging.error(str(e))
+        raise e
 
 
 def sqlite3_writer(row: Dict[str, Any], config: BaseConfig) -> None:
-    pass
+    database = config.sqlite.database
+
+    try:
+        assert os.path.isfile(database), 'Database file {database} does not exist'
+        engine = get_engine(config)
+
+        with engine.begin() as connection:
+            connection.execute("PRAGMA foreign_keys=ON")
+            connection.execute(worklog.insert(), row)
+
+    except Exception as e:
+        logging.error(str(e))
+        raise e
