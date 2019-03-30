@@ -17,3 +17,7 @@ async def message_writer(message: Dict[str, Any], config: BaseConfig) -> None:
     writer.write(json.dumps(message).encode(encoding='utf-8'))
 
     writer.close()
+
+
+def send_message(message: Dict[str, Any], config: BaseConfig) -> None:
+    asyncio.run(message_writer(message, config))
