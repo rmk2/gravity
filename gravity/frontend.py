@@ -1,28 +1,36 @@
 import curses
 import curses.panel
-from collections import namedtuple
 from re import match
-from typing import Sequence
-import uuid
 
-Project = namedtuple('project', ['id', 'name'])
-
-projects = [
-    Project(uuid.uuid4(), 'taod'),
-    Project(uuid.uuid4(), 'AOK BW/ITSCARE'),
-    Project(uuid.uuid4(), 'Boxine'),
-    Project(uuid.uuid4(), 'Chronext'),
-    Project(uuid.uuid4(), 'ERGO/ITERGO'),
-    Project(uuid.uuid4(), 'NetCologne'),
-    Project(uuid.uuid4(), 'Santander'),
-    Project(uuid.uuid4(), 'SCHUFA')
-]
+from gravity.action import import_actions
+from gravity.client import send_message
+from gravity.config import BaseConfig
+from gravity.project import import_projects
 
 
-def main(stdscr, projects: Sequence[str], column_limit: int = 2):
-    _actions = {'S': 'Start', 'F': 'Finish', 'P': 'Pause', 'U': 'Unpause'}
+def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
+    def _transform_actions(config: BaseConfig):
+        actions = {}
+        used_commands = set()
+
+        for action in import_actions(config):
+            _id = action['action_id']
+            _name = action['action_name']
+            _keys = [x.upper() for x in _name if x.upper() not in used_commands]
+
+            if len(_keys) > 0:
+                _command = _keys[0]
+                used_commands.add(_command)
+            else:
+                raise ValueError(f'Could not find unique letter in action {_name} to use as command key')
+
+            actions[_command] = {'action_id': _id, 'action_name': _name}
+
+        return actions
+
+    _actions = _transform_actions(config)
     _controls = {'C': 'Commit', 'Q': 'Quit'}
-    _projects = dict(enumerate(projects))
+    _projects = dict(enumerate(import_projects(config)))
 
     # TODO: consider using a (scrollable) pad to avoid errors if we have
     # _many_ projects (or a very, very small window)
@@ -31,8 +39,9 @@ def main(stdscr, projects: Sequence[str], column_limit: int = 2):
     curses.curs_set(0)
 
     stdscr.addstr(0, 0, 'Actions: ')
-    for idx, action in enumerate(_actions.values()):
-        stdscr.addstr(idx + 1, 0, f'[{action[0:1].upper()}]{action[1:]} ')
+    for idx, action in enumerate(_actions.items()):
+        _command, _action = action
+        stdscr.addstr(idx + 1, 0, f'[{_command}]{_action["action_name"][1:]}')
 
     curses.savetty()
 
@@ -40,7 +49,7 @@ def main(stdscr, projects: Sequence[str], column_limit: int = 2):
         command = stdscr.getkey()
         command = command.upper() if match(r'[a-zA-Z]+', command) else None
 
-        if command in _actions:
+        if command in _actions.keys():
             action = _actions[command]
             break
 
@@ -50,7 +59,7 @@ def main(stdscr, projects: Sequence[str], column_limit: int = 2):
     for idx, project in _projects.items():
         y = idx if idx < height else idx % height
         x = 0 if idx < height else int(idx / height) * 50
-        stdscr.addstr(y + 1, x, f'[{idx}] {project.name}')
+        stdscr.addstr(y + 1, x, f'[{idx}] {project["project_name"]}')
         stdscr.clrtoeol()
 
     while True:
@@ -64,8 +73,8 @@ def main(stdscr, projects: Sequence[str], column_limit: int = 2):
     stdscr.clear()
 
     stdscr.hline('=', 16)
-    stdscr.addstr(1, 0, f'Command: {action}')
-    stdscr.addstr(2, 0, f'Project: {project.name}')
+    stdscr.addstr(1, 0, f'Command: {action["action_name"].capitalize()}')
+    stdscr.addstr(2, 0, f'Project: {project["project_name"]}')
     stdscr.move(3, 0)
     stdscr.hline('=', 16)
 
@@ -78,10 +87,16 @@ def main(stdscr, projects: Sequence[str], column_limit: int = 2):
         select = select.upper() if match(r'[a-zA-Z]+', select) else None
 
         if select == 'C':
+            message = {'project_id': project['project_id'], 'action_id': action['action_id']}
+            send_message(message, config)
             break
         elif select == 'Q':
             break
 
 
+def run_curses(config: BaseConfig):
+    curses.wrapper(_curses_main, config)
+
+
 if __name__ == '__main__':
-    curses.wrapper(main, projects)
+    raise NotImplementedError('Frontend cannot be called directly')
