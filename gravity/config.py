@@ -21,7 +21,8 @@ _postgresql_group = cfg.OptGroup(name='postgresql', help='Configure postgresql s
 
 # Options
 _gravity_opts = [
-    cfg.StrOpt(name='file', default='gravity_projects.json', help='Path to gravity project file', short='f'),
+    cfg.StrOpt(name='projects', default='gravity_projects.json', help='Path to gravity projects file', short='p'),
+    cfg.StrOpt(name='actions', default='gravity_actions.json', help='Path to gravity actions file', short='a'),
     cfg.ListOpt(name='columns', required=False, bounds=True, help='Storage columns', short='c')
 ]
 
@@ -39,7 +40,7 @@ _unix_opts = [
 ]
 
 _backend_opts = [
-    cfg.StrOpt(name='driver', default='csv', help='Storage backend', choices=_backend_choices, short='b'),
+    cfg.StrOpt(name='driver', default='sqlite', help='Storage backend', choices=_backend_choices, short='B')
 ]
 
 _csv_opts = [

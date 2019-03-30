@@ -1,7 +1,8 @@
 from datetime import datetime
 import json
 import logging
-from typing import Sequence, Union
+import os.path
+from typing import Any, Dict, Sequence, Union
 from uuid import uuid4
 
 from gravity.config import BaseConfig
@@ -65,3 +66,22 @@ def export_projects(config: BaseConfig) -> None:
     _projects = [{k: v for k, v in p.items() if k in keys} for p in projects]
 
     print(json.dumps(_projects, indent=4))
+
+
+def import_projects(config: BaseConfig) -> Sequence[Dict[str, Any]]:
+    try:
+        if config.backend.driver in ['sqlite', 'postgresql']:
+            projects = _get_projects(config)
+            projects = [{k: v for k, v in x.items() if k in ['project_id', 'project_name']} for x in projects]
+        else:
+            assert os.path.isfile(config.gravity.projects), 'Projects file does not exist'
+
+            with open(config.gravity.projects, mode='r', encoding='utf-8') as infile:
+                projects = json.load(infile)
+
+        assert len(projects) > 0, 'No projects could be imported'
+        return projects
+
+    except Exception as e:
+        logging.error(str(e))
+        raise e

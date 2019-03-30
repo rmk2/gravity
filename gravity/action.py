@@ -1,7 +1,8 @@
 from datetime import datetime
 import json
 import logging
-from typing import Sequence, Union
+import os.path
+from typing import Any, Dict, Sequence, Union
 from uuid import uuid4
 
 from gravity.config import BaseConfig
@@ -65,3 +66,22 @@ def export_actions(config: BaseConfig) -> None:
     _actions = [{k: v for k, v in p.items() if k in keys} for p in actions]
 
     print(json.dumps(_actions, indent=4))
+
+
+def import_actions(config: BaseConfig) -> Sequence[Dict[str, Any]]:
+    try:
+        if config.backend.driver in ['sqlite', 'postgresql']:
+            actions = _get_actions(config)
+            actions = [{k: v for k, v in x.items() if k in ['action_id', 'action_name']} for x in actions]
+        else:
+            assert os.path.isfile(config.gravity.actions), 'Actions file does not exist'
+
+            with open(config.gravity.actions, mode='r', encoding='utf-8') as infile:
+                actions = json.load(infile)
+
+        assert len(actions) > 0, 'No actions could be imported'
+        return actions
+
+    except Exception as e:
+        logging.error(str(e))
+        raise e
