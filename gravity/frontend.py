@@ -29,7 +29,7 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
         return actions
 
     _actions = _transform_actions(config)
-    _controls = {'C': 'Commit', 'Q': 'Quit'}
+    _controls = {'C': 'Commit', 'R': 'Reset', 'Q': 'Quit'}
     _projects = dict(enumerate(import_projects(config)))
 
     # TODO: consider using a (scrollable) pad to avoid errors if we have
@@ -42,8 +42,6 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
     for idx, action in enumerate(_actions.items()):
         _command, _action = action
         stdscr.addstr(idx + 1, 0, f'[{_command}]{_action["action_name"][1:]}')
-
-    curses.savetty()
 
     while True:
         command = stdscr.getkey()
@@ -90,12 +88,18 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
             message = {'project_id': project['project_id'], 'action_id': action['action_id']}
             send_message(message, config)
             break
+        elif select == 'R':
+            stdscr.clear()
+            _curses_main(stdscr, config, column_limit)
         elif select == 'Q':
             break
 
 
 def run_curses(config: BaseConfig):
-    curses.wrapper(_curses_main, config)
+    try:
+        curses.wrapper(_curses_main, config)
+    except KeyboardInterrupt:
+        exit(1)
 
 
 if __name__ == '__main__':
