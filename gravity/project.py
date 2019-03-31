@@ -14,7 +14,9 @@ def add_projects(projects: Sequence[str], config: BaseConfig) -> None:
     try:
         engine = get_engine(config)
 
-        _projects = [dict(project_id=uuid4(), project_name=project) for project in projects]
+        # Explicitly cast uuid4 objects to str, since sqlite doesn't take kindly to any other form
+        # NB: postgresql has a native UUID datatype, but for portability's sake, we use TEXT instead
+        _projects = [dict(project_id=str(uuid4()), project_name=project) for project in projects]
 
         with engine.begin() as connection:
             connection.execute(project.insert(), _projects)

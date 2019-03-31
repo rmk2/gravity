@@ -14,7 +14,9 @@ def add_actions(actions: Sequence[str], config: BaseConfig) -> None:
     try:
         engine = get_engine(config)
 
-        _actions = [dict(action_id=uuid4(), action_name=action) for action in actions]
+        # Explicitly cast uuid4 objects to str, since sqlite doesn't take kindly to any other form
+        # NB: postgresql has a native UUID datatype, but for portability's sake, we use TEXT instead
+        _actions = [dict(action_id=str(uuid4()), action_name=action) for action in actions]
 
         with engine.begin() as connection:
             connection.execute(action.insert(), _actions)
