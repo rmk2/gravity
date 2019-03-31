@@ -4,6 +4,8 @@ import os
 from datetime import datetime
 from typing import Dict, Any
 
+from sqlalchemy import event
+
 from gravity.config import BaseConfig
 from gravity.database import get_engine
 from gravity.model import worklog
@@ -70,8 +72,23 @@ def sqlite_writer(row: Dict[str, Any], config: BaseConfig) -> None:
         assert os.path.isfile(database), 'Database file {database} does not exist'
         engine = get_engine(config)
 
+        # Override pysqlite's default transaction behaviour
+        # cf. https://docs.sqlalchemy.org/en/latest/dialects/sqlite.html
+        @event.listens_for(engine, "connect")
+        def do_connect(dbapi_connection, connection_record):
+            # disable pysqlite's emitting of the BEGIN statement entirely.
+            # also stops it from emitting COMMIT before any DDL.
+            dbapi_connection.isolation_level = None
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.close()
+
+        @event.listens_for(engine, "begin")
+        def do_begin(connection):
+            # emit our own BEGIN
+            connection.execute("BEGIN EXCLUSIVE")
+
         with engine.begin() as connection:
-            connection.execute("PRAGMA foreign_keys=ON")
             connection.execute(worklog.insert(), row)
 
     except Exception as e:
