@@ -21,7 +21,10 @@ def csv_writer(row: Dict[str, Any], config: BaseConfig) -> None:
                 _quoting = csv.QUOTE_NONE
 
             writer = csv.DictWriter(
-                outfile, fieldnames=config.gravity.columns, delimiter=config.csv.delimiter, quoting=_quoting)
+                outfile,
+                fieldnames=[x.name for x in worklog.columns],
+                delimiter=config.csv.delimiter,
+                quoting=_quoting)
 
             if os.stat(config.csv.output).st_size == 0:
                 writer.writeheader()
