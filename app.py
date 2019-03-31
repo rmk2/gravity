@@ -7,6 +7,7 @@ import gravity.database
 import gravity.project
 
 config = BaseConfig()
+config(default_config_files=['gravity.default.conf'])
 
 initialise_logging(config)
 

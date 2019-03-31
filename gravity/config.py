@@ -89,7 +89,7 @@ _opts = [
 ]
 
 
-def add_subparsers(subparsers: argparse.ArgumentParser) -> cfg.SubCommandOpt:
+def add_subparsers(subparsers: argparse.Namespace) -> None:
     project = subparsers.add_parser('project')
     # project.add_argument('command', choices=['add', 'export', 'list', 'remove'])
     # project.add_argument('projects', type=str, nargs='*')
@@ -122,6 +122,9 @@ def add_subparsers(subparsers: argparse.ArgumentParser) -> cfg.SubCommandOpt:
     _database.add_argument('-p', '--prune', action='store_true', help='Prune database tables')
     _database.add_argument('-t', '--truncate', action='store_true', help='Truncate database tables')
 
+    # Dummy parser to use for testing, making sure that "argument" is still supplied
+    _ = subparsers.add_parser('test')
+
 
 def list_opts() -> Sequence[Tuple[cfg.OptGroup, Sequence[cfg.Opt]]]:
     """List all options. Used by oslo.config to generate example config files"""
@@ -138,7 +141,3 @@ class BaseConfig(cfg.ConfigOpts):
             self.register_cli_opts(opts, group)
 
         self.register_cli_opt(cfg.SubCommandOpt('argument', handler=add_subparsers))
-
-        # Populate config object via its __call__ method. Otherwise, command-line argument parsing etc. won't work
-        # This slightly odd call lets us avoid the worse option of having a global "CONFIG" variable
-        self.__call__()
