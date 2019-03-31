@@ -5,6 +5,7 @@ from typing import Sequence, Tuple
 from oslo_config import cfg
 
 # Choices
+_log_choices = ['error', 'warning', 'info', 'debug']
 _backend_choices = ['stdout', 'csv', 'log', 'sqlite', 'postgresql']
 _frontend_choices = ['cli', 'curses']
 _socket_choices = ['tcp', 'unix']
@@ -12,6 +13,7 @@ _quote_choices = ['all', 'minimal', 'nonnumeric', 'none']
 
 # Option groups
 _gravity_group = cfg.OptGroup(name='gravity', help='Configure gravity project options.')
+_log_group = cfg.OptGroup(name='log', help='Configure logging options')
 _socket_group = cfg.OptGroup(name='socket', help='Configure client/server socket options.')
 _tcp_group = cfg.OptGroup(name='tcp', help='Configure TCP socket options.')
 _unix_group = cfg.OptGroup(name='unix', help='Configure UNIX socket options.')
@@ -25,6 +27,12 @@ _postgresql_group = cfg.OptGroup(name='postgresql', help='Configure postgresql s
 _gravity_opts = [
     cfg.StrOpt(name='projects', default='gravity_projects.json', help='Path to gravity projects file', short='p'),
     cfg.StrOpt(name='actions', default='gravity_actions.json', help='Path to gravity actions file', short='a')
+]
+
+_log_opts = [
+    cfg.StrOpt(name='level', default='info', help='Log level'),
+    cfg.StrOpt(name='file', default='gravity.log', help='Log File'),
+    cfg.ListOpt(name='targets', default=['file', 'console'], help='Log target(s)', bounds=True)
 ]
 
 _socket_opts = [
@@ -68,6 +76,7 @@ _postgresql_opts = [
 
 _opts = [
     (_gravity_group, _gravity_opts),
+    (_log_group, _log_opts),
     (_socket_group, _socket_opts),
     (_tcp_group, _tcp_opts),
     (_unix_group, _unix_opts),
