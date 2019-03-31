@@ -41,7 +41,7 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
     stdscr.addstr(0, 0, 'Actions: ')
     for idx, action in enumerate(_actions.items()):
         _command, _action = action
-        stdscr.addstr(idx + 1, 0, f'[{_command}]{_action["action_name"][1:]}')
+        stdscr.addstr(idx + 1, 0, f'[{_command}] {_action["action_name"].capitalize()}')
 
     while True:
         command = stdscr.getkey()
