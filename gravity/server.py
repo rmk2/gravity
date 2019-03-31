@@ -6,7 +6,7 @@ import sys
 
 import daemon
 
-from gravity.backend import csv_writer, log_writer, postgresql_writer, sqlite3_writer
+from gravity.backend import csv_writer, log_writer, postgresql_writer, sqlite_writer
 from gravity.config import BaseConfig
 
 
@@ -22,8 +22,8 @@ async def message_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWr
         log_writer(message, config)
     elif config.backend.driver == 'postgresql':
         postgresql_writer(message, config)
-    elif config.backend.driver == 'sqlite3':
-        sqlite3_writer(message, config)
+    elif config.backend.driver == 'sqlite':
+        sqlite_writer(message, config)
     elif config.backend.driver == 'stdout':
         print(message)
 

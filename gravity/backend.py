@@ -48,7 +48,7 @@ def postgresql_writer(row: Dict[str, Any], config: BaseConfig) -> None:
         raise e
 
 
-def sqlite3_writer(row: Dict[str, Any], config: BaseConfig) -> None:
+def sqlite_writer(row: Dict[str, Any], config: BaseConfig) -> None:
     database = config.sqlite.database
 
     try:
