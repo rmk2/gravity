@@ -1,11 +1,14 @@
 from gravity.config import BaseConfig
-from gravity.server import start_server
 from gravity.frontend import run_curses
+from gravity.logger import initialise_logging
+from gravity.server import start_server
 import gravity.action
 import gravity.database
 import gravity.project
 
 config = BaseConfig()
+
+initialise_logging(config)
 
 argument = config.argument.name
 

@@ -76,7 +76,7 @@ def import_actions(config: BaseConfig) -> Sequence[Dict[str, Any]]:
             actions = _get_actions(config)
             actions = [{k: v for k, v in x.items() if k in ['action_id', 'action_name']} for x in actions]
         else:
-            assert os.path.isfile(config.gravity.actions), 'Actions file does not exist'
+            assert os.path.isfile(config.gravity.actions), f'Actions file "{config.gravity.actions}" does not exist'
 
             with open(config.gravity.actions, mode='r', encoding='utf-8') as infile:
                 actions = json.load(infile)

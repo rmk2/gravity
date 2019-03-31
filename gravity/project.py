@@ -76,7 +76,7 @@ def import_projects(config: BaseConfig) -> Sequence[Dict[str, Any]]:
             projects = _get_projects(config)
             projects = [{k: v for k, v in x.items() if k in ['project_id', 'project_name']} for x in projects]
         else:
-            assert os.path.isfile(config.gravity.projects), 'Projects file does not exist'
+            assert os.path.isfile(config.gravity.projects), f'Projects file "{config.gravity.projects}" does not exist'
 
             with open(config.gravity.projects, mode='r', encoding='utf-8') as infile:
                 projects = json.load(infile)
