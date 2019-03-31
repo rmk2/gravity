@@ -26,7 +26,8 @@ _postgresql_group = cfg.OptGroup(name='postgresql', help='Configure postgresql s
 # Options
 _gravity_opts = [
     cfg.StrOpt(name='projects', default='gravity_projects.json', help='Path to gravity projects file', short='p'),
-    cfg.StrOpt(name='actions', default='gravity_actions.json', help='Path to gravity actions file', short='a')
+    cfg.StrOpt(name='actions', default='gravity_actions.json', help='Path to gravity actions file', short='a'),
+    cfg.BoolOpt(name='daemon', default=False, help='Run server as daemon')
 ]
 
 _log_opts = [
