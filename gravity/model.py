@@ -6,7 +6,7 @@ _metadata = MetaData()
 
 project = Table(
     'project', _metadata,
-    Column('project_id', VARCHAR(37), primary_key=True),
+    Column('project_id', VARCHAR(36), primary_key=True),
     Column('project_name', VARCHAR, nullable=False), Column('description', VARCHAR, nullable=True),
     Column('created', TIMESTAMP(timezone=True), nullable=False, default=datetime.now),
     Column('updated', TIMESTAMP(timezone=True), nullable=False, default=datetime.now, onupdate=datetime.now),
@@ -14,7 +14,7 @@ project = Table(
 
 action = Table(
     'action', _metadata,
-    Column('action_id', VARCHAR(37), primary_key=True),
+    Column('action_id', VARCHAR(36), primary_key=True),
     Column('action_name', VARCHAR, nullable=False), Column('description', VARCHAR, nullable=True),
     Column('created', TIMESTAMP(timezone=True), nullable=False, default=datetime.now),
     Column('updated', TIMESTAMP(timezone=True), nullable=False, default=datetime.now, onupdate=datetime.now),
@@ -23,6 +23,6 @@ action = Table(
 worklog = Table(
     'worklog', _metadata,
     Column('worklog_id', INTEGER, primary_key=True),
-    Column('project_id', VARCHAR(37), ForeignKey('project.project_id'), nullable=False),
-    Column('action_id', VARCHAR(37), ForeignKey('action.action_id'), nullable=False),
+    Column('project_id', VARCHAR(36), ForeignKey('project.project_id'), nullable=False),
+    Column('action_id', VARCHAR(36), ForeignKey('action.action_id'), nullable=False),
     Column('timestamp', TIMESTAMP(timezone=True), nullable=False, default=datetime.now))
