@@ -30,7 +30,7 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
 
     _actions = _transform_actions(config)
     _controls = {'C': 'Commit', 'R': 'Reset', 'Q': 'Quit'}
-    _projects = dict(enumerate(import_projects(config)))
+    _projects = dict(enumerate(sorted(import_projects(config), key=lambda x: x['project_name'])))
 
     # TODO: consider using a (scrollable) pad to avoid errors if we have
     # _many_ projects (or a very, very small window)

@@ -1,3 +1,5 @@
+from os.path import dirname, join
+
 from gravity.config import BaseConfig
 from gravity.frontend import run_curses
 from gravity.logger import initialise_logging
@@ -7,7 +9,7 @@ import gravity.database
 import gravity.project
 
 config = BaseConfig()
-config(default_config_files=['gravity.default.conf'])
+config(default_config_files=[join(dirname(__file__), 'gravity.default.conf')])
 
 initialise_logging(config)
 
