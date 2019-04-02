@@ -45,7 +45,7 @@ def _get_actions(config: BaseConfig) -> Sequence[Union[tuple, None]]:
         engine = get_engine(config)
 
         with engine.begin() as connection:
-            result = connection.execute(action.select())
+            result = connection.execute(action.select().where(action.c.deleted == None))
 
             return result.fetchall()
 

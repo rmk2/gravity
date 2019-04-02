@@ -45,7 +45,7 @@ def _get_projects(config: BaseConfig) -> Sequence[Union[tuple, None]]:
         engine = get_engine(config)
 
         with engine.begin() as connection:
-            result = connection.execute(project.select())
+            result = connection.execute(project.select().where(project.c.deleted == None))
 
             return result.fetchall()
 
