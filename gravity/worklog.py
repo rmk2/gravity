@@ -12,9 +12,9 @@ def _parse_modifier(modifier: str) -> Union[timedelta, None]:
     delta = None
 
     modifier = modifier.lower()
-    _modifier = re.match(r'(?i)([+-]){1}(\d+)([smh]{1})', modifier)
+    _modifier = re.match(r'(?i)([+-]){1}([0-9]+)([smh]{1})', modifier)
 
-    assert _modifier, f'Expression "{modifier}" does not match required format: [+-][0-9][smh]'
+    assert _modifier, f'Expression "{modifier}" does not match required format: [+-][0-9]+[smh]'
     assert len(_modifier.groups()) == 3, f'Could not extract all required options from expression "{modifier}"'
 
     operator, offset, unit = _modifier.groups()

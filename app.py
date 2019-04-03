@@ -7,6 +7,7 @@ from gravity.server import start_server
 import gravity.action
 import gravity.database
 import gravity.project
+import gravity.worklog
 
 config = BaseConfig()
 config(default_config_files=[join(dirname(__file__), 'gravity.default.conf')])
@@ -60,3 +61,10 @@ elif argument == 'database':
 
     elif config.argument.truncate:
         gravity.database.truncate(config)
+
+elif argument == 'worklog':
+    if config.argument.amend:
+        gravity.worklog.modify_worklog(config.argument.amend[0], config)
+
+    elif config.argument.remove:
+        gravity.worklog.remove_worklog(config)

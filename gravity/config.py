@@ -122,6 +122,11 @@ def add_subparsers(subparsers: argparse.Namespace) -> None:
     _database.add_argument('-p', '--prune', action='store_true', help='Prune database tables')
     _database.add_argument('-t', '--truncate', action='store_true', help='Truncate database tables')
 
+    worklog = subparsers.add_parser('worklog')
+    _worklog = worklog.add_mutually_exclusive_group(required=True)
+    _worklog.add_argument('-a', '--amend', nargs=argparse.REMAINDER, metavar='WORKLOG', help='Amend last worklog')
+    _worklog.add_argument('-r', '--remove', action='store_true', help='Remove last worklog')
+
     # Dummy parser to use for testing, making sure that "argument" is still supplied
     _ = subparsers.add_parser('test')
 
