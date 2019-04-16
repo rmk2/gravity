@@ -8,7 +8,7 @@ from gravity.config import BaseConfig
 from gravity.project import import_projects
 
 
-def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
+def _curses_main(stdscr, config: BaseConfig, column_limit: int = 4):
     def _transform_actions(config: BaseConfig):
         actions = {}
         used_commands = set()
@@ -29,7 +29,7 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
         return actions
 
     _actions = _transform_actions(config)
-    _controls = {'C': 'Commit', 'R': 'Reset', 'Q': 'Quit'}
+    _controls = {'C': 'Commit', 'N': 'Next', 'R': 'Reset', 'Q': 'Quit'}
     _projects = dict(enumerate(sorted(import_projects(config), key=lambda x: x['project_name'])))
 
     # TODO: consider using a (scrollable) pad to avoid errors if we have
@@ -41,7 +41,9 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
     stdscr.addstr(0, 0, 'Actions: ')
     for idx, action in enumerate(_actions.items()):
         _command, _action = action
-        stdscr.addstr(idx + 1, 0, f'[{_command}] {_action["action_name"].capitalize()}')
+        y = idx if idx < height - 2 else idx % (height - 1)
+        x = 0 if idx < height - 2 else int(idx / (height - 1)) * 50
+        stdscr.addstr(y + 1, x, f'[{_command}] {_action["action_name"].capitalize()}')
 
     while True:
         command = stdscr.getkey()
@@ -55,8 +57,8 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
 
     stdscr.addstr(0, 0, 'Projects:')
     for idx, project in _projects.items():
-        y = idx if idx < height else idx % height
-        x = 0 if idx < height else int(idx / height) * 50
+        y = idx if idx < height - 2 else idx % (height - 1)
+        x = 0 if idx < height - 2 else int(idx / (height - 1)) * 50
         stdscr.addstr(y + 1, x, f'[{idx}] {project["project_name"]}')
         stdscr.clrtoeol()
 
@@ -87,12 +89,17 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 2):
         if select == 'C':
             message = {'project_id': project['project_id'], 'action_id': action['action_id']}
             send_message(message, config)
-            break
+            exit(0)
+        elif select == 'N':
+            message = {'project_id': project['project_id'], 'action_id': action['action_id']}
+            send_message(message, config)
+            stdscr.clear()
+            _curses_main(stdscr, config, column_limit)
         elif select == 'R':
             stdscr.clear()
             _curses_main(stdscr, config, column_limit)
         elif select == 'Q':
-            break
+            exit(0)
 
 
 def run_curses(config: BaseConfig):
