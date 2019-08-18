@@ -1,13 +1,14 @@
 from os.path import dirname, join
 
-from gravity.config import BaseConfig
-from gravity.frontend import run_curses
-from gravity.logger import initialise_logging
-from gravity.server import start_server
 import gravity.action
 import gravity.database
 import gravity.project
 import gravity.worklog
+from gravity.client import send_message
+from gravity.config import BaseConfig
+from gravity.frontend import run_curses
+from gravity.logger import initialise_logging
+from gravity.server import start_server
 
 config = BaseConfig()
 config(default_config_files=[join(dirname(__file__), 'gravity.default.conf')])
@@ -25,7 +26,7 @@ elif argument == 'client':
 
 elif argument == 'project':
     if config.argument.add:
-        gravity.project.add_projects(config.argument.add, config)
+        send_message({'request': 'add_projects', 'payload': {'projects': config.argument.add}}, config)
 
     elif config.argument.export:
         gravity.project.export_projects(config)
@@ -34,11 +35,11 @@ elif argument == 'project':
         gravity.project.list_projects(config)
 
     elif config.argument.remove:
-        gravity.project.remove_projects(config.argument.remove, config)
+        send_message({'request': 'remove_projects', 'payload': {'projects': config.argument.remove}}, config)
 
 elif argument == 'action':
     if config.argument.add:
-        gravity.action.add_actions(config.argument.add, config)
+        send_message({'request': 'add_actions', 'payload': {'projects': config.argument.add}}, config)
 
     elif config.argument.export:
         gravity.action.export_actions(config)
@@ -47,7 +48,7 @@ elif argument == 'action':
         gravity.action.list_actions(config)
 
     elif config.argument.remove:
-        gravity.action.remove_actions(config.argument.remove, config)
+        send_message({'request': 'remove_actions', 'payload': {'projects': config.argument.remove}}, config)
 
 elif argument == 'database':
     if config.argument.drop:
@@ -64,7 +65,7 @@ elif argument == 'database':
 
 elif argument == 'worklog':
     if config.argument.amend:
-        gravity.worklog.modify_worklog(config.argument.amend[0], config)
+        send_message({'request': 'modify_worklog', 'payload': {'modifier': config.argument.amend[0]}}, config)
 
     elif config.argument.remove:
-        gravity.worklog.remove_worklog(config)
+        send_message({'request': 'remove_worklog'}, config)
