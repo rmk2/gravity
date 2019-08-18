@@ -1,11 +1,11 @@
 import asyncio
-from typing import Dict, Any
 import json
+from typing import Any, Dict, Union
 
 from gravity.config import BaseConfig
 
 
-async def message_writer(message: Dict[str, Any], config: BaseConfig) -> None:
+async def message_writer(message: Dict[str, Any], config: BaseConfig) -> Union[Dict[str, Any], None]:
     """Pass a byte-encoded JSON message to a server via TCP or UNIX socket"""
     if config.socket.type == 'tcp':
         reader, writer = await asyncio.open_connection(host=config.tcp.host, port=config.tcp.port)
@@ -15,9 +15,17 @@ async def message_writer(message: Dict[str, Any], config: BaseConfig) -> None:
         raise AssertionError(f"Requested socket type is not one of: 'tcp', 'unix'")
 
     writer.write(json.dumps(message).encode(encoding='utf-8'))
+    writer.write_eof()
+    await writer.drain()
+
+    data = await reader.read()
+    assert data, 'No data has been received'
+    response = json.loads(data.decode(encoding='utf-8'))
 
     writer.close()
 
+    return response
 
-def send_message(message: Dict[str, Any], config: BaseConfig) -> None:
-    asyncio.run(message_writer(message, config))
+
+def send_message(message: Dict[str, Any], config: BaseConfig) -> Union[Dict[str, Any], None]:
+    return asyncio.run(message_writer(message, config))

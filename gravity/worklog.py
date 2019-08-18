@@ -1,8 +1,9 @@
-from datetime import timedelta
 import logging
 import re
-from typing import Union
+from datetime import timedelta
+from typing import Dict, Union
 
+from gravity.backend import csv_writer, log_writer, postgresql_writer, sqlite_writer
 from gravity.config import BaseConfig
 from gravity.database import get_engine
 from gravity.model import worklog
@@ -62,6 +63,24 @@ def remove_worklog(config: BaseConfig) -> None:
 
             connection.execute(worklog.delete().where(worklog.c.worklog_id == _id))
             logging.info('Removed last worklog')
+
+    except Exception as e:
+        logging.error(str(e))
+        raise e
+
+
+def add_worklog(row: Dict[str, str], config: BaseConfig) -> None:
+    try:
+        if config.backend.driver == 'csv':
+            csv_writer(row, config)
+        elif config.backend.driver == 'log':
+            log_writer(row, config)
+        elif config.backend.driver == 'postgresql':
+            postgresql_writer(row, config)
+        elif config.backend.driver == 'sqlite':
+            sqlite_writer(row, config)
+        elif config.backend.driver == 'stdout':
+            print(row)
 
     except Exception as e:
         logging.error(str(e))
