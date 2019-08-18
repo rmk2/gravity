@@ -7,6 +7,7 @@ from functools import partial
 from typing import Any, Dict
 
 import daemon
+import websockets
 
 from gravity.action import add_actions, import_actions, remove_actions
 from gravity.config import BaseConfig
@@ -43,6 +44,27 @@ def request_handler(message: Dict[str, Any], config: BaseConfig) -> callable:
     return request_types.get(request, None)
 
 
+async def websocket_handler(websocket: websockets.WebSocketServerProtocol, path: str, config: BaseConfig) -> None:
+    """Receive, decode, and handle data received by the server via Websocket"""
+    try:
+        while True:
+            data = await websocket.recv()
+            assert data, 'No data has been received'
+            request = json.loads(data)
+
+            logging.debug(request)
+
+            handler = request_handler(request, config)
+            response = json.dumps({'response': handler()})
+
+            logging.debug(response)
+
+            await websocket.send(response)
+
+    except Exception as e:
+        logging.error(repr(e))
+
+
 async def socket_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, config: BaseConfig) -> None:
     """Receive, decode, and handle data received by the server via TCP/UNIX socket before handling them"""
     try:
@@ -66,14 +88,18 @@ async def socket_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
 
 async def start_listener(config: BaseConfig) -> None:
+    """Receive data sent by clients via TCP or UNIX socket, or via Websocket"""
+    _websocket_handler = partial(websocket_handler, config=config)
     _socket_handler = partial(socket_handler, config=config)
 
     if config.socket.type == 'tcp':
         server = await asyncio.start_server(_socket_handler, host=config.tcp.host, port=config.tcp.port)
     elif config.socket.type == 'unix':
         server = await asyncio.start_unix_server(_socket_handler, path=config.unix.socket)
+    elif config.socket.type == 'websockets':
+        server = await websockets.serve(_websocket_handler, host=config.tcp.host, port=config.tcp.port)
     else:
-        raise AssertionError(f"Requested socket type is not one of: 'tcp', 'unix'")
+        raise AssertionError(f"Requested socket type is not one of: 'tcp', 'unix', 'websockets'")
 
     server_options = {
         'type': config.socket.type,
@@ -85,8 +111,11 @@ async def start_listener(config: BaseConfig) -> None:
     logging.info(f'Server started. Listening on {server_options["socket"]}')
     logging.debug(f'{server_options}')
 
-    async with server:
-        await server.serve_forever()
+    if config.socket.type == 'websockets':
+        await server.wait_closed()
+    else:
+        async with server:
+            await server.serve_forever()
 
 
 def start_server(config: BaseConfig) -> None:

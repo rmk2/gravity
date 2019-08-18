@@ -8,7 +8,7 @@ from oslo_config import cfg
 _log_choices = ['error', 'warning', 'info', 'debug']
 _backend_choices = ['stdout', 'csv', 'log', 'sqlite', 'postgresql']
 _frontend_choices = ['cli', 'curses']
-_socket_choices = ['tcp', 'unix']
+_socket_choices = ['tcp', 'unix', 'websockets']
 _quote_choices = ['all', 'minimal', 'nonnumeric', 'none']
 
 # Option groups
