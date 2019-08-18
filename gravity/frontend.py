@@ -2,10 +2,8 @@ import curses
 import curses.panel
 from re import match
 
-from gravity.action import import_actions
 from gravity.client import send_message
 from gravity.config import BaseConfig
-from gravity.project import import_projects
 
 
 def _curses_main(stdscr, config: BaseConfig, column_limit: int = 4):
@@ -13,7 +11,9 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 4):
         actions = {}
         used_commands = set()
 
-        for action in import_actions(config):
+        _actions_response = send_message({'request': 'get_actions'}, config).get('response').get('actions')
+
+        for action in _actions_response:
             _id = action['action_id']
             _name = action['action_name']
             _keys = [x.upper() for x in _name if x.upper() not in used_commands]
@@ -28,12 +28,13 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 4):
 
         return actions
 
+    _projects_response = send_message({'request': 'get_projects'}, config).get('response').get('projects')
+
     _actions = _transform_actions(config)
     _controls = {'C': 'Commit', 'N': 'Next', 'R': 'Reset', 'Q': 'Quit'}
-    _projects = dict(enumerate(sorted(import_projects(config), key=lambda x: x['project_name'])))
+    _projects = dict(enumerate(sorted(_projects_response, key=lambda x: x['project_name'])))
 
-    # TODO: consider using a (scrollable) pad to avoid errors if we have
-    # _many_ projects (or a very, very small window)
+    # TODO: consider using a (scrollable) pad to avoid errors if we have _many_ projects (or a very, very small window)
     height, _ = stdscr.getmaxyx()
 
     curses.curs_set(0)
@@ -88,11 +89,11 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 4):
 
         if select == 'C':
             message = {'project_id': project['project_id'], 'action_id': action['action_id']}
-            send_message(message, config)
+            send_message({'request': 'add_worklog', 'payload': {'worklog': message}}, config)
             exit(0)
         elif select == 'N':
             message = {'project_id': project['project_id'], 'action_id': action['action_id']}
-            send_message(message, config)
+            send_message({'request': 'add_worklog', 'payload': {'worklog': message}}, config)
             stdscr.clear()
             _curses_main(stdscr, config, column_limit)
         elif select == 'R':
