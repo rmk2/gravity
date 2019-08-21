@@ -44,6 +44,9 @@ elif argument == 'action':
     elif config.argument.export:
         gravity.action.export_actions(config)
 
+    elif config.argument.ingest:
+        gravity.action.import_actions(config, config.argument.ingest)
+
     elif config.argument.list:
         gravity.action.list_actions(config)
 

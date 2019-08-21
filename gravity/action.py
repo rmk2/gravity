@@ -70,7 +70,7 @@ def export_actions(config: BaseConfig) -> None:
     print(json.dumps(_actions, indent=4))
 
 
-def import_actions(config: BaseConfig) -> Sequence[Dict[str, Any]]:
+def get_actions(config: BaseConfig) -> Sequence[Dict[str, Any]]:
     try:
         if config.backend.driver in ['sqlite', 'postgresql']:
             actions = _get_actions(config)
@@ -83,6 +83,23 @@ def import_actions(config: BaseConfig) -> Sequence[Dict[str, Any]]:
 
         assert len(actions) > 0, 'No actions could be imported'
         return actions
+
+    except Exception as e:
+        logging.error(str(e))
+        raise e
+
+
+def import_actions(config: BaseConfig, filename: str) -> None:
+    try:
+        engine = get_engine(config)
+
+        assert os.path.isfile(filename), f'Actions file "{filename}" does not exist'
+
+        with open(filename, mode='r', encoding='utf-8') as infile:
+            _actions = json.load(infile)
+
+        with engine.begin() as connection:
+            connection.execute(action.insert(), _actions)
 
     except Exception as e:
         logging.error(str(e))

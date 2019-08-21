@@ -111,6 +111,7 @@ def add_subparsers(subparsers: argparse.Namespace) -> None:
     _action = action.add_mutually_exclusive_group(required=True)
     _action.add_argument('-a', '--add', nargs=argparse.REMAINDER, metavar='ACTION', help='Add action(s)')
     _action.add_argument('-e', '--export', action='store_true', help='Export actions)')
+    _action.add_argument('-i', '--ingest', '--import', metavar='FILE', type=str, help='Import actions')
     _action.add_argument('-l', '--list', action='store_true', help='List actions')
     _action.add_argument('-r', '--remove', nargs=argparse.REMAINDER, metavar='ACTION', help='Remove action(s)')
 
