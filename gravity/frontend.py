@@ -1,13 +1,14 @@
 import curses
 import curses.panel
 from re import match
+from typing import Dict
 
 from gravity.client import send_message
 from gravity.config import BaseConfig
 
 
-def _curses_main(stdscr, config: BaseConfig, column_limit: int = 4):
-    def _transform_actions(config: BaseConfig):
+def _curses_main(stdscr, config: BaseConfig, column_limit: int = 4) -> None:
+    def _transform_actions(config: BaseConfig) -> Dict[str, Dict[str, str]]:
         actions = {}
         used_commands = set()
 
@@ -73,26 +74,46 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 4):
 
     stdscr.clear()
 
+    if project.get('project_key') is not None:
+        curses.curs_set(1)
+        stdscr.addstr(0, 0, 'Enter ticket number: ')
+        curses.setsyx(1, 0)
+        curses.echo()
+
+        while True:
+            ticket = stdscr.getstr(5).decode('utf-8')
+            ticket = int(ticket) if match(r'\d+', ticket) else None
+
+            break
+
+        curses.noecho()
+        curses.curs_set(0)
+        stdscr.clear()
+    else:
+        ticket = None
+
     stdscr.hline('=', 16)
     stdscr.addstr(1, 0, f'Command: {action["action_name"].capitalize()}')
     stdscr.addstr(2, 0, f'Project: {project["project_name"]}')
-    stdscr.move(3, 0)
+    stdscr.addstr(3, 0, f'Ticket:  {project["project_key"]}-{ticket}') if ticket is not None else None
+    stdscr.move(4, 0) if ticket is not None else stdscr.move(3, 0)
     stdscr.hline('=', 16)
 
-    stdscr.move(5, 0)
+    stdscr.move(6, 0) if ticket is not None else stdscr.move(5, 0)
     for idx, control in enumerate(_controls.values()):
         stdscr.addstr(f'[{control[0:1].upper()}]{control[1:]} ')
+
+    message = {'project_id': project['project_id'], 'action_id': action['action_id']}
+    message = {**message, 'ticket_key': f'{project["project_key"]}-{ticket}'} if ticket is not None else message
 
     while True:
         select = stdscr.getkey()
         select = select.upper() if match(r'[a-zA-Z]+', select) else None
 
         if select == 'C':
-            message = {'project_id': project['project_id'], 'action_id': action['action_id']}
             send_message({'request': 'add_worklog', 'payload': {'worklog': message}}, config)
             exit(0)
         elif select == 'N':
-            message = {'project_id': project['project_id'], 'action_id': action['action_id']}
             send_message({'request': 'add_worklog', 'payload': {'worklog': message}}, config)
             stdscr.clear()
             _curses_main(stdscr, config, column_limit)
