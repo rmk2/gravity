@@ -39,7 +39,7 @@ elif argument == 'project':
 
 elif argument == 'action':
     if config.argument.add:
-        send_message({'request': 'add_actions', 'payload': {'projects': config.argument.add}}, config)
+        send_message({'request': 'add_actions', 'payload': {'actions': config.argument.add}}, config)
 
     elif config.argument.export:
         gravity.action.export_actions(config)
@@ -48,7 +48,7 @@ elif argument == 'action':
         gravity.action.list_actions(config)
 
     elif config.argument.remove:
-        send_message({'request': 'remove_actions', 'payload': {'projects': config.argument.remove}}, config)
+        send_message({'request': 'remove_actions', 'payload': {'actions': config.argument.remove}}, config)
 
 elif argument == 'database':
     if config.argument.drop:
