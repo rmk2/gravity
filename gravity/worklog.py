@@ -30,7 +30,7 @@ def _parse_modifier(modifier: str) -> Union[timedelta, None]:
     return delta
 
 
-def modify_worklog(modifier: str, config: BaseConfig) -> None:
+def modify_worklog(modifier: str, config: BaseConfig) -> str:
     try:
         engine = get_engine(config)
 
@@ -44,14 +44,18 @@ def modify_worklog(modifier: str, config: BaseConfig) -> None:
             _timestamp = select_row['timestamp'] + delta
 
             connection.execute(worklog.update().where(worklog.c.worklog_id == _id).values(timestamp=_timestamp))
+
+            message = f'Modified last worklog: {select_row["timestamp"]} → {_timestamp}'
             logging.info(f'Modified last worklog: {select_row["timestamp"]} → {_timestamp}')
+
+            return message
 
     except Exception as e:
         logging.error(str(e))
         raise e
 
 
-def remove_worklog(config: BaseConfig) -> None:
+def remove_worklog(config: BaseConfig) -> str:
     try:
         engine = get_engine(config)
 
@@ -62,7 +66,11 @@ def remove_worklog(config: BaseConfig) -> None:
             _id = select_row['worklog_id']
 
             connection.execute(worklog.delete().where(worklog.c.worklog_id == _id))
-            logging.info('Removed last worklog')
+
+            message = 'Removed last worklog'
+            logging.info(message)
+
+            return message
 
     except Exception as e:
         logging.error(str(e))

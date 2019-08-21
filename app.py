@@ -65,7 +65,9 @@ elif argument == 'database':
 
 elif argument == 'worklog':
     if config.argument.amend:
-        send_message({'request': 'modify_worklog', 'payload': {'modifier': config.argument.amend[0]}}, config)
+        message = send_message({'request': 'modify_worklog', 'payload': {'modifier': config.argument.amend[0]}}, config)
+        print(message.get('response'))
 
     elif config.argument.remove:
-        send_message({'request': 'remove_worklog'}, config)
+        message = send_message({'request': 'remove_worklog'}, config)
+        print(message.get('response'))
