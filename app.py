@@ -31,6 +31,9 @@ elif argument == 'project':
     elif config.argument.export:
         gravity.project.export_projects(config)
 
+    elif config.argument.ingest:
+        gravity.project.import_projects(config, config.argument.ingest)
+
     elif config.argument.list:
         gravity.project.list_projects(config)
 

@@ -96,6 +96,7 @@ def add_subparsers(subparsers: argparse.Namespace) -> None:
     _project = project.add_mutually_exclusive_group(required=True)
     _project.add_argument('-a', '--add', nargs=argparse.REMAINDER, metavar='PROJECT', help='Add project(s)')
     _project.add_argument('-e', '--export', action='store_true', help='Export projects)')
+    _project.add_argument('-i', '--ingest', '--import', metavar='FILE', type=str, help='Import projects')
     _project.add_argument('-l', '--list', action='store_true', help='List projects')
     _project.add_argument('-r', '--remove', nargs=argparse.REMAINDER, metavar='PROJECT', help='Remove project(s)')
 

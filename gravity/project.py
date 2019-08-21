@@ -70,7 +70,7 @@ def export_projects(config: BaseConfig) -> None:
     print(json.dumps(_projects, indent=4))
 
 
-def import_projects(config: BaseConfig) -> Sequence[Dict[str, Any]]:
+def get_projects(config: BaseConfig) -> Sequence[Dict[str, Any]]:
     try:
         if config.backend.driver in ['sqlite', 'postgresql']:
             projects = _get_projects(config)
@@ -87,3 +87,21 @@ def import_projects(config: BaseConfig) -> Sequence[Dict[str, Any]]:
     except Exception as e:
         logging.error(str(e))
         raise e
+
+
+def import_projects(config: BaseConfig, filename: str) -> None:
+    try:
+        engine = get_engine(config)
+
+        assert os.path.isfile(filename), f'Projects file "{filename}" does not exist'
+
+        with open(filename, mode='r', encoding='utf-8') as infile:
+            _projects = json.load(infile)
+
+        with engine.begin() as connection:
+            connection.execute(project.insert(), _projects)
+
+    except Exception as e:
+        logging.error(str(e))
+        raise e
+
