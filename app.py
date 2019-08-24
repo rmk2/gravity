@@ -85,3 +85,16 @@ elif argument == 'worklog':
     elif config.argument.remove:
         message = send_message({'request': 'remove_worklog'}, config)
         print(message.get('response'))
+
+elif argument == 'annotate':
+    if config.argument.project and (config.argument.description or config.argument.key):
+        _project = config.argument.project
+        _description = config.argument.description
+        _key = config.argument.key
+
+        _annotation = {'project': _project, 'description': _description, 'key': _key}
+        message = send_message({'request': 'annotate_project', 'payload': {'annotation': _annotation}}, config)
+        print(message.get('response')) if message.get('response') is not None else None
+
+    else:
+        print('Missing argument: Pass at least one of --description <DESCRIPTION> or --key <KEY>')
