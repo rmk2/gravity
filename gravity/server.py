@@ -11,7 +11,7 @@ import websockets
 
 from gravity.action import get_actions, insert_actions, remove_actions
 from gravity.config import BaseConfig
-from gravity.project import get_projects, insert_projects, remove_projects
+from gravity.project import annotate_project, get_projects, insert_projects, remove_projects
 from gravity.worklog import add_worklog, modify_worklog, remove_worklog
 
 
@@ -35,7 +35,9 @@ def request_handler(message: Dict[str, Any], config: BaseConfig) -> callable:
         # worklogs
         'add_worklog': lambda: add_worklog(payload.get('worklog'), config),
         'modify_worklog': lambda: modify_worklog(payload.get('modifier'), config),
-        'remove_worklog': lambda: remove_worklog(config)
+        'remove_worklog': lambda: remove_worklog(config),
+        # annotate
+        'annotate_project': lambda: annotate_project(payload.get('annotation'), config)
     }
     request_types['get_data'] = lambda: {**request_types['get_projects'](), **request_types['get_actions']()}
 
@@ -80,11 +82,16 @@ async def socket_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
         logging.debug(response)
 
         writer.write(response)
-        await writer.drain()
-        writer.close()
 
     except Exception as e:
         logging.error(repr(e))
+
+        response = json.dumps({'response': str(e)}).encode(encoding='utf-8')
+        writer.write(response)
+
+    finally:
+        await writer.drain()
+        writer.close()
 
 
 async def start_listener(config: BaseConfig) -> None:
