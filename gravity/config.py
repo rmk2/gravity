@@ -100,6 +100,11 @@ def add_subparsers(subparsers: argparse.Namespace) -> None:
     _project.add_argument('-l', '--list', action='store_true', help='List projects')
     _project.add_argument('-r', '--remove', nargs=argparse.REMAINDER, metavar='PROJECT', help='Remove project(s)')
 
+    annotate = subparsers.add_parser('annotate', help='Annotate a given project')
+    annotate.add_argument('project', metavar='PROJECT', type=str, help='Project UUID')
+    annotate.add_argument('-d', '--description', metavar='DESCRIPTION', type=str, help='Project description')
+    annotate.add_argument('-k', '--key', metavar='KEY', type=str, help='Project key')
+
     server = subparsers.add_parser('server')
     # server.add_argument('command', choices=['start', 'stop'])
 

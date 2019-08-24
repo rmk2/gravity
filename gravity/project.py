@@ -78,9 +78,11 @@ def export_projects(projects: Sequence[Dict[str, str]]) -> None:
 
 def get_projects(config: BaseConfig) -> Sequence[Dict[str, Any]]:
     try:
+        keys = ['project_id', 'project_name', 'project_key']
+
         if config.backend.driver in ['sqlite', 'postgresql']:
             projects = _get_projects(config)
-            projects = [{k: v for k, v in x.items() if k in ['project_id', 'project_name']} for x in projects]
+            projects = [{k: v for k, v in x.items() if k in keys} for x in projects]
         else:
             assert os.path.isfile(config.gravity.projects), f'Projects file "{config.gravity.projects}" does not exist'
 
@@ -108,3 +110,29 @@ def import_projects(filename: str) -> Sequence[Dict[str, str]]:
         logging.error(str(e))
         raise e
 
+
+def annotate_project(annotation: Dict[str, str], config: BaseConfig) -> str:
+    try:
+        engine = get_engine(config)
+
+        _projects = get_projects(config)
+
+        _project = annotation.get('project')
+        _description = annotation.get('description')
+        _key = annotation.get('key')
+
+        assert _project in [x.get('project_id') for x in _projects], f'Project {_project} does not exist'
+
+        with engine.begin() as connection:
+            connection.execute(project.update()
+                               .where(project.c.project_id == _project)
+                               .values(description=_description, project_key=_key))
+
+        message = f'Annotated project {_project}'
+        logging.info(message)
+
+        return message
+
+    except Exception as e:
+        logging.error(str(e))
+        raise e
