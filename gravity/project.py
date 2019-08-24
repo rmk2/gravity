@@ -69,7 +69,7 @@ def list_projects(projects: Sequence[Dict[str, str]]) -> None:
 
 
 def export_projects(projects: Sequence[Dict[str, str]]) -> None:
-    keys = ['project_id', 'project_name']
+    keys = ['project_id', 'project_name', 'project_key']
 
     _projects = [{k: v for k, v in p.items() if k in keys} for p in projects]
 
