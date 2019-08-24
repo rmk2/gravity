@@ -26,16 +26,20 @@ elif argument == 'client':
 
 elif argument == 'project':
     if config.argument.add:
-        send_message({'request': 'add_projects', 'payload': {'projects': config.argument.add}}, config)
+        _projects = gravity.project.add_projects(config.argument.add)
+        send_message({'request': 'insert_projects', 'payload': {'projects': _projects}}, config)
 
     elif config.argument.export:
-        gravity.project.export_projects(config)
+        _projects = send_message({'request': 'get_projects'}, config).get('response', {}).get('projects', [])
+        gravity.project.export_projects(_projects)
 
     elif config.argument.ingest:
-        gravity.project.import_projects(config, config.argument.ingest)
+        _projects = gravity.project.import_projects(config.argument.ingest)
+        send_message({'request': 'insert_projects', 'payload': {'projects': _projects}}, config)
 
     elif config.argument.list:
-        gravity.project.list_projects(config)
+        _projects = send_message({'request': 'get_projects'}, config).get('response', {}).get('projects', [])
+        gravity.project.list_projects(_projects)
 
     elif config.argument.remove:
         send_message({'request': 'remove_projects', 'payload': {'projects': config.argument.remove}}, config)

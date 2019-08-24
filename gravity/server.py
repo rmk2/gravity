@@ -11,7 +11,7 @@ import websockets
 
 from gravity.action import get_actions, insert_actions, remove_actions
 from gravity.config import BaseConfig
-from gravity.project import add_projects, get_projects, remove_projects
+from gravity.project import get_projects, insert_projects, remove_projects
 from gravity.worklog import add_worklog, modify_worklog, remove_worklog
 
 
@@ -29,7 +29,7 @@ def request_handler(message: Dict[str, Any], config: BaseConfig) -> callable:
         'get_actions': lambda: {'actions': get_actions(config)},
         'remove_actions': lambda: remove_actions(payload.get('actions'), config),
         # projects
-        'add_projects': lambda: add_projects(payload.get('projects'), config),
+        'insert_projects': lambda: insert_projects(payload.get('projects', []), config),
         'get_projects': lambda: {'projects': get_projects(config)},
         'remove_projects': lambda: remove_projects(payload.get('projects'), config),
         # worklogs

@@ -10,16 +10,25 @@ from gravity.database import get_engine
 from gravity.model import project
 
 
-def add_projects(projects: Sequence[str], config: BaseConfig) -> None:
+def insert_projects(projects: Sequence[Dict[str, str]], config: BaseConfig) -> None:
     try:
         engine = get_engine(config)
 
+        with engine.begin() as connection:
+            connection.execute(project.insert(), projects)
+
+    except Exception as e:
+        logging.error(str(e))
+        raise e
+
+
+def add_projects(projects: Sequence[str]) -> Sequence[Dict[str, str]]:
+    try:
         # Explicitly cast uuid4 objects to str, since sqlite doesn't take kindly to any other form
         # NB: postgresql has a native UUID datatype, but for portability's sake, we use TEXT instead
         _projects = [dict(project_id=str(uuid4()), project_name=project) for project in projects]
 
-        with engine.begin() as connection:
-            connection.execute(project.insert(), _projects)
+        return _projects
 
     except Exception as e:
         logging.error(str(e))
@@ -54,15 +63,12 @@ def _get_projects(config: BaseConfig) -> Sequence[Union[tuple, None]]:
         raise e
 
 
-def list_projects(config: BaseConfig) -> None:
-    projects = _get_projects(config)
-
+def list_projects(projects: Sequence[Dict[str, str]]) -> None:
     for _project in projects:
         print(f'{_project["project_id"]}\t{_project["project_name"]}')
 
 
-def export_projects(config: BaseConfig) -> None:
-    projects = _get_projects(config)
+def export_projects(projects: Sequence[Dict[str, str]]) -> None:
     keys = ['project_id', 'project_name']
 
     _projects = [{k: v for k, v in p.items() if k in keys} for p in projects]
@@ -89,17 +95,14 @@ def get_projects(config: BaseConfig) -> Sequence[Dict[str, Any]]:
         raise e
 
 
-def import_projects(config: BaseConfig, filename: str) -> None:
+def import_projects(filename: str) -> Sequence[Dict[str, str]]:
     try:
-        engine = get_engine(config)
-
         assert os.path.isfile(filename), f'Projects file "{filename}" does not exist'
 
         with open(filename, mode='r', encoding='utf-8') as infile:
             _projects = json.load(infile)
 
-        with engine.begin() as connection:
-            connection.execute(project.insert(), _projects)
+        return _projects
 
     except Exception as e:
         logging.error(str(e))
