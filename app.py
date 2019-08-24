@@ -42,16 +42,20 @@ elif argument == 'project':
 
 elif argument == 'action':
     if config.argument.add:
-        send_message({'request': 'add_actions', 'payload': {'actions': config.argument.add}}, config)
+        _actions = gravity.action.add_actions(config.argument.add)
+        send_message({'request': 'insert_actions', 'payload': {'actions': _actions}}, config)
 
     elif config.argument.export:
-        gravity.action.export_actions(config)
+        _actions = send_message({'request': 'get_actions'}, config).get('response', {}).get('actions', [])
+        gravity.action.export_actions(_actions)
 
     elif config.argument.ingest:
-        gravity.action.import_actions(config, config.argument.ingest)
+        _actions = gravity.action.import_actions(config.argument.ingest)
+        send_message({'request': 'insert_actions', 'payload': {'actions': _actions}}, config)
 
     elif config.argument.list:
-        gravity.action.list_actions(config)
+        _actions = send_message({'request': 'get_actions'}, config).get('response', {}).get('actions', [])
+        gravity.action.list_actions(_actions)
 
     elif config.argument.remove:
         send_message({'request': 'remove_actions', 'payload': {'actions': config.argument.remove}}, config)

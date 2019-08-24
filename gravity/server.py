@@ -9,7 +9,7 @@ from typing import Any, Dict
 import daemon
 import websockets
 
-from gravity.action import add_actions, get_actions, remove_actions
+from gravity.action import get_actions, insert_actions, remove_actions
 from gravity.config import BaseConfig
 from gravity.project import add_projects, get_projects, remove_projects
 from gravity.worklog import add_worklog, modify_worklog, remove_worklog
@@ -25,7 +25,7 @@ def request_handler(message: Dict[str, Any], config: BaseConfig) -> callable:
 
     request_types = {
         # actions
-        'add_actions': lambda: add_actions(payload.get('actions'), config),
+        'insert_actions': lambda: insert_actions(payload.get('actions'), config),
         'get_actions': lambda: {'actions': get_actions(config)},
         'remove_actions': lambda: remove_actions(payload.get('actions'), config),
         # projects

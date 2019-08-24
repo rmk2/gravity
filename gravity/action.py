@@ -10,16 +10,25 @@ from gravity.database import get_engine
 from gravity.model import action
 
 
-def add_actions(actions: Sequence[str], config: BaseConfig) -> None:
+def insert_actions(actions: Sequence[Dict[str, str]], config: BaseConfig) -> None:
     try:
         engine = get_engine(config)
 
+        with engine.begin() as connection:
+            connection.execute(action.insert(), actions)
+
+    except Exception as e:
+        logging.error(str(e))
+        raise e
+
+
+def add_actions(actions: Sequence[str]) -> Sequence[Dict[str, str]]:
+    try:
         # Explicitly cast uuid4 objects to str, since sqlite doesn't take kindly to any other form
         # NB: postgresql has a native UUID datatype, but for portability's sake, we use TEXT instead
         _actions = [dict(action_id=str(uuid4()), action_name=action) for action in actions]
 
-        with engine.begin() as connection:
-            connection.execute(action.insert(), _actions)
+        return _actions
 
     except Exception as e:
         logging.error(str(e))
@@ -54,15 +63,12 @@ def _get_actions(config: BaseConfig) -> Sequence[Union[tuple, None]]:
         raise e
 
 
-def list_actions(config: BaseConfig) -> None:
-    actions = _get_actions(config)
-
+def list_actions(actions: Sequence[Dict[str, str]]) -> None:
     for _action in actions:
         print(f'{_action["action_id"]}\t{_action["action_name"]}')
 
 
-def export_actions(config: BaseConfig) -> None:
-    actions = _get_actions(config)
+def export_actions(actions: Sequence[Dict[str, str]]) -> None:
     keys = ['action_id', 'action_name']
 
     _actions = [{k: v for k, v in p.items() if k in keys} for p in actions]
@@ -89,17 +95,14 @@ def get_actions(config: BaseConfig) -> Sequence[Dict[str, Any]]:
         raise e
 
 
-def import_actions(config: BaseConfig, filename: str) -> None:
+def import_actions(filename: str) -> Sequence[Dict[str, str]]:
     try:
-        engine = get_engine(config)
-
         assert os.path.isfile(filename), f'Actions file "{filename}" does not exist'
 
         with open(filename, mode='r', encoding='utf-8') as infile:
             _actions = json.load(infile)
 
-        with engine.begin() as connection:
-            connection.execute(action.insert(), _actions)
+        return _actions
 
     except Exception as e:
         logging.error(str(e))
