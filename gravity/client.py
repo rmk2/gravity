@@ -1,5 +1,6 @@
 import asyncio
 import json
+import sys
 from typing import Any, Dict, Union
 
 from gravity.config import BaseConfig
@@ -28,4 +29,16 @@ async def message_writer(message: Dict[str, Any], config: BaseConfig) -> Union[D
 
 
 def send_message(message: Dict[str, Any], config: BaseConfig) -> Union[Dict[str, Any], None]:
-    return asyncio.run(message_writer(message, config))
+    try:
+        message = asyncio.run(message_writer(message, config))
+        error = message.get('response', {}).get('error')
+
+        if error:
+            raise Exception(error)
+        else:
+            return message
+
+    except Exception as e:
+        print(str(e), file=sys.stderr)
+        exit(1)
+

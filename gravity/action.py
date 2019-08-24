@@ -87,7 +87,7 @@ def get_actions(config: BaseConfig) -> Sequence[Dict[str, Any]]:
             with open(config.gravity.actions, mode='r', encoding='utf-8') as infile:
                 actions = json.load(infile)
 
-        assert len(actions) > 0, 'No actions could be imported'
+        assert len(actions) > 0, 'No actions could be found'
         return actions
 
     except Exception as e:

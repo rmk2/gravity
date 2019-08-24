@@ -56,15 +56,19 @@ async def websocket_handler(websocket: websockets.WebSocketServerProtocol, path:
 
             logging.debug(request)
 
-            handler = request_handler(request, config)
-            response = json.dumps({'response': handler()})
+            handler = request_handler(request, config)()  # call handler, since it returns a function
+            response = json.dumps({'response': handler if handler is not None else {}})
 
             logging.debug(response)
 
             await websocket.send(response)
 
     except Exception as e:
+        response = json.dumps({'response': {'error': str(e)}})
+
         logging.error(repr(e))
+
+        await websocket.send(response)
 
 
 async def socket_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, config: BaseConfig) -> None:
@@ -76,17 +80,18 @@ async def socket_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
         logging.debug(request)
 
-        handler = request_handler(request, config)
-        response = json.dumps({'response': handler()}).encode(encoding='utf-8')
+        handler = request_handler(request, config)()  # call handler, since it returns a function
+        response = json.dumps({'response': handler if handler is not None else {}}).encode(encoding='utf-8')
 
         logging.debug(response)
 
         writer.write(response)
 
     except Exception as e:
+        response = json.dumps({'response': {'error': str(e)}}).encode(encoding='utf-8')
+
         logging.error(repr(e))
 
-        response = json.dumps({'response': str(e)}).encode(encoding='utf-8')
         writer.write(response)
 
     finally:

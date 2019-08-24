@@ -89,7 +89,7 @@ def get_projects(config: BaseConfig) -> Sequence[Dict[str, Any]]:
             with open(config.gravity.projects, mode='r', encoding='utf-8') as infile:
                 projects = json.load(infile)
 
-        assert len(projects) > 0, 'No projects could be imported'
+        assert len(projects) > 0, 'No projects could be found'
         return projects
 
     except Exception as e:
