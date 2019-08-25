@@ -31,7 +31,11 @@ async def message_writer(message: Dict[str, Any], config: BaseConfig) -> Union[D
 def send_message(message: Dict[str, Any], config: BaseConfig) -> Union[Dict[str, Any], None]:
     try:
         message = asyncio.run(message_writer(message, config))
-        error = message.get('response', {}).get('error')
+
+        if isinstance(message.get('response'), dict):
+            error = message.get('response', {}).get('error')
+        else:
+            error = False
 
         if error:
             raise Exception(error)
@@ -41,4 +45,3 @@ def send_message(message: Dict[str, Any], config: BaseConfig) -> Union[Dict[str,
     except Exception as e:
         print(str(e), file=sys.stderr)
         exit(1)
-
