@@ -1,8 +1,8 @@
-from datetime import datetime
 import json
 import logging
 import os.path
-from typing import Any, Dict, Sequence, Union
+from datetime import datetime
+from typing import Any, Dict, Sequence, Tuple, Union
 from uuid import uuid4
 
 from gravity.config import BaseConfig
@@ -49,7 +49,7 @@ def remove_projects(projects: Sequence[str], config: BaseConfig) -> None:
         raise e
 
 
-def _get_projects(config: BaseConfig) -> Sequence[Union[tuple, None]]:
+def _get_projects(config: BaseConfig) -> Sequence[Union[Tuple[str, Any], None]]:
     try:
         engine = get_engine(config)
 
