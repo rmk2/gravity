@@ -1,0 +1,12 @@
+[Unit]
+Description=Gravity Worklog Server Component
+
+[Service]
+Type=simple
+# WorkingDirectory=<Optional path to gravity working directory>
+PIDFile=/run/gravity.pid
+ExecStart=gravity --config-file <Path to gravity config file> server
+Restart=always
+
+[Install]
+WantedBy=default.target
