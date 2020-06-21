@@ -111,7 +111,7 @@ _opts = [
 
 
 def add_subparsers(subparsers: argparse.Namespace) -> None:
-    project = subparsers.add_parser('project')
+    project = subparsers.add_parser('project', help='Administrate project data')
     # project.add_argument('command', choices=['add', 'export', 'list', 'remove'])
     # project.add_argument('projects', type=str, nargs='*')
     _project = project.add_mutually_exclusive_group(required=True)
@@ -126,13 +126,13 @@ def add_subparsers(subparsers: argparse.Namespace) -> None:
     annotate.add_argument('-d', '--description', metavar='DESCRIPTION', type=str, help='Project description')
     annotate.add_argument('-k', '--key', metavar='KEY', type=str, help='Project key')
 
-    server = subparsers.add_parser('server')
+    server = subparsers.add_parser('server', help='Start a gravity server instance')
     # server.add_argument('command', choices=['start', 'stop'])
 
-    client = subparsers.add_parser('client')
+    client = subparsers.add_parser('client', help='Run a gravity client instance')
     # client.add_argument('command', choices=['record'])
 
-    action = subparsers.add_parser('action')
+    action = subparsers.add_parser('action', help='Administrate event action data')
     # action.add_argument('command', choices=['add', 'export', 'list', 'remove'])
     # action.add_argument('actions', type=str, nargs='*')
     _action = action.add_mutually_exclusive_group(required=True)
@@ -142,7 +142,7 @@ def add_subparsers(subparsers: argparse.Namespace) -> None:
     _action.add_argument('-l', '--list', action='store_true', help='List actions')
     _action.add_argument('-r', '--remove', nargs=argparse.REMAINDER, metavar='ACTION', help='Remove action(s)')
 
-    database = subparsers.add_parser('database')
+    database = subparsers.add_parser('database', help='Configure the backend database')
     # database.add_argument('command', choices=['initialise', 'truncate'])
     _database = database.add_mutually_exclusive_group(required=True)
     _database.add_argument('-d', '--drop', action='store_true', help='Drop database tables')
@@ -150,7 +150,7 @@ def add_subparsers(subparsers: argparse.Namespace) -> None:
     _database.add_argument('-p', '--prune', action='store_true', help='Prune database tables')
     _database.add_argument('-t', '--truncate', action='store_true', help='Truncate database tables')
 
-    worklog = subparsers.add_parser('worklog')
+    worklog = subparsers.add_parser('worklog', help='Manipulate worklog entries')
     _worklog = worklog.add_mutually_exclusive_group(required=True)
     _worklog.add_argument('-a', '--amend', nargs=argparse.REMAINDER, metavar='WORKLOG', help='Amend last worklog')
     _worklog.add_argument('-r', '--remove', action='store_true', help='Remove last worklog')
