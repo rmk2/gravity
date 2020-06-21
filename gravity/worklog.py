@@ -3,7 +3,7 @@ import re
 from datetime import timedelta
 from typing import Dict, Union
 
-from gravity.backend import csv_writer, log_writer, postgresql_writer, sqlite_writer
+from gravity.backend.writer import csv_writer, log_writer, postgresql_writer, sqlite_writer
 from gravity.config import BaseConfig
 from gravity.database import get_engine
 from gravity.model import worklog

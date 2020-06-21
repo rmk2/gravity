@@ -4,11 +4,11 @@ import gravity.action
 import gravity.database
 import gravity.project
 import gravity.worklog
-from gravity.client import send_message
+from gravity.backend.client import send_message
 from gravity.config import BaseConfig
-from gravity.frontend import run_curses
+from gravity.frontend.curses import run_curses
 from gravity.logger import initialise_logging
-from gravity.server import start_server
+from gravity.backend.server import start_server
 
 
 def main():

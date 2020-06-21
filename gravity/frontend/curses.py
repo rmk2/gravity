@@ -3,7 +3,7 @@ import curses.panel
 from re import match
 from typing import Dict
 
-from gravity.client import send_message
+from gravity.backend.client import send_message
 from gravity.config import BaseConfig
 
 
@@ -104,7 +104,7 @@ def _curses_main(stdscr, config: BaseConfig, column_limit: int = 4) -> None:
         stdscr.addstr(f'[{control[0:1].upper()}]{control[1:]} ')
 
     message = {'project_id': project['project_id'], 'action_id': action['action_id']}
-    message = {**message, 'ticket_key': f'{project["project_key"]}-{ticket}'} if ticket is not None else message
+    message = {**message, 'ticket_key': ticket} if ticket is not None else message
 
     while True:
         select = stdscr.getkey()
