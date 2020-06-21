@@ -10,8 +10,8 @@ something other than REST, by sending JSON messages via various sockets (TCP/UNI
 time tracking events to the underlying server, which in turn saves them to a database.
 
 This repository also holds an example frontend for the application, which provides a curses-based interface to quickly
-input event data from the console. It also provides a rich set of command-line options to influence client, server, and
-database configuration/behaviour.
+input event data from the console. It additionally provides a rich set of command-line options to influence client,
+server, and database configuration/behaviour.
 
 The name `gravity` stems from my personal frustration with the state of time tracking in my consulting job, where I
 regularly work on multiple projects (let alone multiple tickets) on a daily basis, and where I often have to switch
@@ -78,9 +78,9 @@ The application is broken down into a number of sub-commands which range from ru
 the client, to administrative tools that allow users to initialise the backend database, to administer project setup and
 so on.
 
-By using `oslo-config`, all configuration can also be done via command-line arguments, which somewhat bloats the
-available help text somewhat. An abbreviated overview of existing sub-commands is shown below, while the full list of
-commands and/or configuration options can be queried via `gravity --help`:
+By using `oslo-config`, all configuration can also be done via command-line arguments, which bloats the available help
+text somewhat. An abbreviated overview of existing sub-commands is shown below, while the full list of commands and/or
+configuration options can be queried via `gravity --help`:
 
 ```
 usage: gravity [-h] [--config-dir DIR] [--config-file PATH] ...
@@ -122,7 +122,7 @@ optional arguments:
 The project requires a running server instance, which serves as a central sender/receiver for any event messages, which
 saves events to the configured storage backend, and which reads stored data in order to return it to the client.
 
-The server normally communicates via either TCP or UNIX socket, and can be started manually started via:
+The server normally communicates via either TCP or UNIX socket, and can be started manually via:
 
 ```
 # Start the server, keep it in the foreground
@@ -132,12 +132,13 @@ gravity server
 gravity --main-daemon server
 ```
 
-Alternatively, a systemd service file is included in the `contrib/systemd/gravity.service`, which can be installed as a
-user or system service, making sure that the gravity server gets started in the background whenever the system starts.
+Alternatively, a systemd service file is included in `contrib/systemd/gravity.service`, which can be installed as a
+user or system service, making sure that the gravity server gets started in the background whenever the user logs in or 
+when the system starts.
 
 Personally, I use (and prefer) the systemd user service route, which means that the service file should be copied to
 `~/.config/systemd/user/`. After reloading systemd (or logging out and in again), the server can then be started,
-stopped, or enabled upon boot via `systemctl`:
+stopped, or enabled upon login via `systemctl`:
 
 ```
 # Enable gravity user service on user login
@@ -153,13 +154,13 @@ systemctl --user stop gravity
 ### Running the client
 
 Once the server has been started via any of the above methods, the client can simply be run via `gravity client`.
-Depending on the configured frontend (`curses` by default), 
+Depending on the configured frontend (`curses` by default), this will allow users to actually track worklog events.
 
 ### Initialising the database
 
 If `gravity` is configured to use either SQLite or PostgreSQL as storage backend, a standard set of tables is defined
 in `models.py` which are enough to get the database up and running. Via the command-line, this means initialising all
-data base tables, and then defining at least two (2) actions and one (1) project:
+database tables, and then defining at least two (2) actions and one (1) project:
 
 ```
 # Initialise database tables
@@ -184,7 +185,7 @@ aea14166-d22e-44c1-a30e-adc595a9d689    My First Project
 a9dccfe5-800d-4af7-a3ab-fa09eca87bfc    Stop
 ```
 
-UUIDs, as listed above, are generated randomly, and will differ each time projects/actions are created.
+NB: UUIDs, as listed above, are generated randomly, and will differ each time projects/actions are created.
 
 ## Concepts
 
