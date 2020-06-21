@@ -4,18 +4,16 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pytest = "==5.1.0"
-jedi = "*"
-rope = "*"
-autopep8 = "*"
-yapf = "*"
+pytest = "==5.4.3"
+pbr = "==5.4.5"
 
 [packages]
-oslo-config = "==6.11.0"
-sqlalchemy = "==1.3.7"
-psycopg2-binary = "==2.8.3"
-python-daemon = "==2.2.3"
-websockets = "==8.0.2"
+oslo-config = "==8.2.0"
+sqlalchemy = "==1.3.17"
+psycopg2-binary = "==2.8.5"
+python-daemon = "==2.2.4"
+websockets = "==8.1.0"
+pytest = "==5.4.3"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
