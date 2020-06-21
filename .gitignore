@@ -1,6 +1,9 @@
 # Python
 .venv/
 __pycache__/
+dist/
+*.egg-info/
+.eggs/
 
 Pipfile.lock
 
