@@ -35,7 +35,7 @@ To retrieve the full source code and initialise a local virtual environment incl
 
 ```
 # Git
-git clone git@bitbucket.org:rmk2/gravity.git
+git clone git@github.com:rmk2/gravity.git
 
 # Pipenv
 # NB: with the switch -d, pipenv also installs development packages, such as pytest
