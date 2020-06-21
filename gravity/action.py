@@ -84,7 +84,7 @@ def get_actions(config: BaseConfig) -> Sequence[Dict[str, Any]]:
         else:
             assert os.path.isfile(config.gravity.actions), f'Actions file "{config.gravity.actions}" does not exist'
 
-            with open(config.gravity.actions, mode='r', encoding='utf-8') as infile:
+            with open(config.main.actions, mode='r', encoding='utf-8') as infile:
                 actions = json.load(infile)
 
         assert len(actions) > 0, 'No actions could be found'

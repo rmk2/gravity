@@ -1,18 +1,39 @@
 import argparse
-import copy
 from typing import Sequence, Tuple
 
 from oslo_config import cfg
 
 # Choices
 _log_choices = ['error', 'warning', 'info', 'debug']
-_backend_choices = ['stdout', 'csv', 'log', 'sqlite', 'postgresql']
-_frontend_choices = ['cli', 'curses']
-_socket_choices = ['tcp', 'unix', 'websockets']
-_quote_choices = ['all', 'minimal', 'nonnumeric', 'none']
+
+_quote_choices = [
+    ('all', 'Quote all fields, regardless of type'),
+    ('nonnumeric', 'Quote all non-numeric fields'),
+    ('minimal', 'Only quote fields which contain special characters'),
+    ('none', 'Do not quote any fields, only escape delimiters'),
+]
+
+_frontend_choices = [
+    ('cli', 'Command-line interface to log events'),
+    ('curses', 'Curses-based interface to log events'),
+]
+
+_socket_choices = [
+    ('tcp', 'Use a TCP socket to communicate with the server'),
+    ('unix', 'Use a UNIX socket to communicate with the server'),
+    ('websockets', 'Use a WebSocket to communicate with the server'),
+]
+
+_backend_choices = [
+    ('stdout', 'Print events to stdout'),
+    ('csv', 'Write events to a CSV file'),
+    ('log', 'Write events to a log file'),
+    ('sqlite', 'Write events to a SQLite database'),
+    ('postgresql', 'Write events to a PostgreSQL database'),
+]
 
 # Option groups
-_gravity_group = cfg.OptGroup(name='gravity', help='Configure gravity project options.')
+_main_group = cfg.OptGroup(name='main', help='Configure gravity project options.')
 _log_group = cfg.OptGroup(name='log', help='Configure logging options')
 _socket_group = cfg.OptGroup(name='socket', help='Configure client/server socket options.')
 _tcp_group = cfg.OptGroup(name='tcp', help='Configure TCP socket options.')
@@ -24,7 +45,7 @@ _sqlite_group = cfg.OptGroup(name='sqlite', help='Configure sqlite storage backe
 _postgresql_group = cfg.OptGroup(name='postgresql', help='Configure postgresql storage backend options.')
 
 # Options
-_gravity_opts = [
+_main_opts = [
     cfg.StrOpt(name='projects', default='gravity_projects.json', help='Path to gravity projects file', short='p'),
     cfg.StrOpt(name='actions', default='gravity_actions.json', help='Path to gravity actions file', short='a'),
     cfg.BoolOpt(name='daemon', default=False, help='Run server as daemon')
@@ -76,7 +97,7 @@ _postgresql_opts = [
 ]
 
 _opts = [
-    (_gravity_group, _gravity_opts),
+    (_main_group, _main_opts),
     (_log_group, _log_opts),
     (_socket_group, _socket_opts),
     (_tcp_group, _tcp_opts),
@@ -140,7 +161,7 @@ def add_subparsers(subparsers: argparse.Namespace) -> None:
 
 def list_opts() -> Sequence[Tuple[cfg.OptGroup, Sequence[cfg.Opt]]]:
     """List all options. Used by oslo.config to generate example config files"""
-    return [(g, copy.deepcopy(o)) for g, o in _opts]
+    return [(g, o) for g, o in _opts]
 
 
 class BaseConfig(cfg.ConfigOpts):

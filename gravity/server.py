@@ -117,7 +117,7 @@ async def start_listener(config: BaseConfig) -> None:
         'type': config.socket.type,
         'socket': server.sockets[0].getsockname(),
         'backend': config.backend.driver,
-        'daemon': config.gravity.daemon
+        'daemon': config.main.daemon
     }
 
     logging.info(f'Server started. Listening on {server_options["socket"]}')
@@ -135,9 +135,9 @@ def start_server(config: BaseConfig) -> None:
         sys.exit(0)
 
     try:
-        if not config.gravity.daemon:
+        if not config.main.daemon:
             asyncio.run(start_listener(config))
-        elif config.gravity.daemon:
+        elif config.main.daemon:
             with daemon.DaemonContext(signal_map={signal.SIGTERM: daemon_shutdown, signal.SIGTSTP: daemon_shutdown}):
                 asyncio.run(start_listener(config))
 

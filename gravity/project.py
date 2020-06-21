@@ -86,7 +86,7 @@ def get_projects(config: BaseConfig) -> Sequence[Dict[str, Any]]:
         else:
             assert os.path.isfile(config.gravity.projects), f'Projects file "{config.gravity.projects}" does not exist'
 
-            with open(config.gravity.projects, mode='r', encoding='utf-8') as infile:
+            with open(config.main.projects, mode='r', encoding='utf-8') as infile:
                 projects = json.load(infile)
 
         assert len(projects) > 0, 'No projects could be found'
